@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>윰이쌤 복습 게임방</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xpressengine/xeicon@2.3.3/xeicon.min.css">
+  <link rel="stylesheet" href="https://hangeul.pstatic.net/hangeul_static/css/nanum-square-round.css">
+  <style>
+    /* ===== 색·크기는 여기서 바꾸면 돼요 ===== */
+    :root {
+      --bg: #EFEFEF;          /* 바깥 배경 */
+      --main-bg: #FFFFFF;     /* 박스 배경 */
+      --sub-bg: #F6F6F6;      /* 연한 배경 */
+      --border: #DDDDDD;      /* 테두리 */
+      --font: #555555;        /* 기본 글자 */
+      --sub: #999999;         /* 흐린 글자 */
+      --point: #6EA0FB;       /* 포인트 색 */
+      --radius: 5px;
+      --side-w: 285px;
+      --content-w: 450px;
+      --height: 625px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; list-style: none; }
+    html { background: var(--bg); }
+    body {
+      font-family: 'NanumSquareRound', -apple-system, sans-serif;
+      font-size: 12px; line-height: 1.3; letter-spacing: .5px;
+      color: var(--font); background: var(--bg);
+      opacity: 0; transition: opacity .8s ease-in;
+    }
+    body.loaded { opacity: 1; }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+    i[class^="xi-"] { font-size: 13px; }
+
+    .box { background: var(--main-bg); border: 1px solid var(--border); border-radius: var(--radius); }
+
+    #container {
+      width: calc(var(--side-w) + var(--content-w) + 20px);
+      margin: 100px auto 120px;
+      display: flex; gap: 20px; align-items: stretch;
+    }
+
+    /* ---------- 왼쪽 ---------- */
+    #side { width: var(--side-w); height: var(--height); display: flex; flex-direction: column; gap: 10px; }
+    #s-title { display: flex; gap: 10px; }
+    #s-title .home { flex: 1; display: flex; align-items: center; height: 35px; }
+    .icn { width: 33px; flex: none; display: flex; justify-content: center; align-items: center; align-self: stretch; border-right: 1px solid var(--border); }
+    #s-title .home b { padding: 0 10px; letter-spacing: 1px; }
+    #s-title .menu-btn { width: 35px; height: 35px; display: flex; justify-content: center; align-items: center; }
+
+    #profile {
+      flex: 1; min-height: 0; overflow: hidden; position: relative;
+      background: linear-gradient(160deg, #cfe0ff 0%, #9dbdfc 45%, #6ea0fb 100%);
+      background-size: cover; background-position: center;
+    }
+    #profile .deco {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      justify-content: flex-end; padding: 18px; color: #fff;
+    }
+    #profile .deco .big { font-size: 26px; font-weight: 800; line-height: 1.1; letter-spacing: 0; text-shadow: 0 1px 8px rgba(40,70,140,.25); }
+    #profile .deco .small { margin-top: 6px; opacity: .9; }
+    #profile .bubble { position: absolute; border-radius: 50%; background: rgba(255,255,255,.28); }
+
+    #personal > div { display: flex; border-bottom: 1px solid var(--border); }
+    #personal > div:last-child { border-bottom: 0; }
+    #personal .icn { padding: 9px 0; align-items: flex-start; }
+    .psn { flex: 1; padding: 9px 12px; min-width: 0; }
+    .psn.nick { font-weight: 700; }
+    .tags span { color: var(--point); margin-right: 6px; display: inline-block; }
+    .links { display: flex; flex-wrap: wrap; gap: 5px; }
+    .links a { border: 1px solid var(--border); border-radius: 20px; padding: 2px 9px; color: var(--sub); font-size: 11px; transition: .3s; }
+    .links a:hover { color: var(--point); border-color: var(--point); }
+
+    /* ---------- 오른쪽 ---------- */
+    #content { width: var(--content-w); height: var(--height); position: relative; overflow: hidden; display: flex; flex-direction: column; }
+    .c-head { display: flex; align-items: stretch; height: 35px; flex: none; border-bottom: 1px solid var(--border); }
+    .c-head .t { display: flex; align-items: center; padding: 0 12px; gap: 4px; }
+    .c-head .t b { color: var(--font); }
+    .c-head .t span { color: var(--sub); }
+
+    .wrapper { flex: 1; overflow-y: auto; padding: 8px; scrollbar-width: none; }
+    .wrapper::-webkit-scrollbar { width: 0; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+
+    .card { display: block; padding: 8px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--main-bg); transition: border-color .3s, transform .3s; }
+    .card:hover { border-color: var(--point); transform: translateY(-2px); }
+    .thumb { aspect-ratio: 5/3; border-radius: var(--radius); border: 1px solid var(--border); background-size: cover; background-position: center; overflow: hidden; position: relative; display: flex; align-items: center; justify-content: center; }
+    .thumb .num { font-size: 40px; font-weight: 800; color: rgba(255,255,255,.92); letter-spacing: -1px; }
+    .thumb .num small { font-size: 15px; font-weight: 700; margin-left: 1px; }
+    .thumb .ic { position: absolute; right: 8px; bottom: 6px; color: rgba(255,255,255,.85); }
+    .thumb .ic i { font-size: 18px; }
+    .card .title { margin-top: 10px; font-weight: 700; color: var(--font); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card .meta { color: var(--sub); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card .meta .dot { margin: 0 4px; }
+    .card .sum { margin-top: 5px; color: var(--sub); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+    .card.locked { cursor: default; }
+    .card.locked:hover { border-color: var(--border); transform: none; }
+    .card.locked .thumb { filter: grayscale(1) opacity(.55); }
+    .card.locked .title i { color: var(--sub); margin-left: 3px; font-size: 11px; }
+
+    .empty { padding: 60px 0; text-align: center; color: var(--sub); }
+    .empty i { display: block; font-size: 22px; margin-bottom: 8px; }
+
+    .c-foot { height: 35px; flex: none; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--sub); font-size: 11px; }
+
+    /* 카테고리 슬라이드 메뉴 */
+    #came {
+      position: absolute; top: 0; left: 0; bottom: 0; width: 200px; background: var(--main-bg); z-index: 5;
+      border-right: 1px solid var(--border); box-shadow: 4px 0 16px rgba(0,0,0,.04);
+      transform: translateX(-102%); transition: transform .6s cubic-bezier(.6,0,.2,1);
+      display: flex; flex-direction: column;
+    }
+    #came.open { transform: translateX(0); }
+    #came .list { flex: 1; padding: 8px 0; overflow-y: auto; }
+    #came .list button { width: 100%; text-align: left; padding: 10px 16px; display: flex; justify-content: space-between; color: var(--font); }
+    #came .list button:hover, #came .list button.on { color: var(--point); }
+    #came .list button span { color: var(--sub); }
+    #came .close { height: 35px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding-left: 12px; }
+    #came .close .icn { border-right: 0; border-left: 1px solid var(--border); }
+
+    .credit { text-align: center; color: var(--sub); font-size: 11px; margin: -90px 0 40px; }
+
+    /* ---------- 모바일 ---------- */
+    @media (max-width: 767px) {
+      #container { width: auto; margin: 16px; flex-direction: column; gap: 10px; }
+      #side, #content { width: 100%; height: auto; }
+      #profile { flex: none; height: 180px; }
+      #content { min-height: 0; }
+      .wrapper { overflow: visible; }
+      .credit { margin: 0 0 30px; }
+    }
+    @media (max-width: 380px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<!-- =====================================================
+     ✏️ 수정은 아래 SETTINGS / GAMES 부분만 고치면 돼요
+     ===================================================== -->
+<script>
+const SETTINGS = {
+  title: "Review Room",                 // 왼쪽 위 제목
+  nick: "윰이쌤",                         // 닉네임 줄
+  tags: ["#수도공고", "#English"],
+  intro: "윰이쌤의 영어 수업 아카이브 :)",
+  profileImage: "",                     // 사진 넣고 싶으면 "images/profile.jpg" 처럼 경로 입력
+  profileBig: "Let's<br>Review!",
+  profileSmall: "수도공고 1학년 영어 복습 게임",
+  links: [
+    { text: "교시 알리미", url: "#" }   // ← 교시 알리미 주소를 넣어주세요
+  ]
+};
+
+// 게임 목록 — 카드 하나 = 한 줄
+// url: 폴더 주소 (예: "lesson1/") · ready: false면 '준비 중' 잠금 카드
+// colors: 썸네일 그라데이션 두 색 · icon: XEIcon 이름 (xpressengine.github.io/XEIcon)
+// thumb: 사진을 쓰고 싶으면 "images/lesson1.jpg" 처럼 경로 입력 (가로:세로 5:3), 비워두면 그라데이션
+const GAMES = [
+  { lesson: 1, cat: "1과", title: "Bonding with Others", sub: "An Unusual Rescue Effort",
+    desc: "구조 이야기 속 단어·문법(cause+목적어+to부정사, 콤마+which) 복습",
+    url: "lesson1/", ready: true, date: "2026-10-30", colors: ["#9ec5fe", "#6ea0fb"], icon: "xi-heart-o", thumb: "" },
+  { lesson: 2, cat: "2과", title: "Frances Glessner Lee", sub: "Forensic Science",
+    desc: "one of the + 최상급, It-cleft 문장으로 사건 해결하기",
+    url: "lesson2/", ready: true, date: "2026-10-30", colors: ["#c9b8f5", "#8f7be8"], icon: "xi-search", thumb: "" },
+  { lesson: 3, cat: "3과", title: "A Timeless Symbol of Korea", sub: "Knowing Ourselves, Knowing Others",
+    desc: "호랑이 본문 방탈출 — so ~ that, 조동사 + have p.p.",
+    url: "lesson3/", ready: true, date: "2026-10-30", colors: ["#ffd3a5", "#f59e5b"], icon: "xi-key", thumb: "" },
+  { lesson: 4, cat: "4과", title: "Coming Soon", sub: "다음 과",
+    desc: "다음 단원 복습 게임을 준비하고 있어요.",
+    url: "", ready: false, date: "", colors: ["#d7dde5", "#b4bdc9"], icon: "xi-lock", thumb: "" }
+];
+</script>
+<!-- ===================================================== -->
+
+<div id="container">
+
+  <div id="side">
+    <div id="s-title">
+      <a class="home box" href="./"><div class="icn"><i class="xi-home"></i></div><b id="t-title"></b></a>
+      <button class="menu-btn box" id="menuBtn" aria-label="카테고리 열기"><i class="xi-bars"></i></button>
+    </div>
+
+    <div id="profile" class="box">
+      <span class="bubble" style="width:120px;height:120px;top:-30px;right:-30px"></span>
+      <span class="bubble" style="width:60px;height:60px;top:70px;left:24px;opacity:.6"></span>
+      <div class="deco"><div class="big" id="p-big"></div><div class="small" id="p-small"></div></div>
+    </div>
+
+    <div id="personal" class="box">
+      <div><div class="icn"><i class="xi-user"></i></div><div class="psn nick" id="t-nick"></div></div>
+      <div><div class="icn"><i class="xi-heart"></i></div><div class="psn tags" id="t-tags"></div></div>
+      <div><div class="icn"><i class="xi-pen"></i></div><div class="psn" id="t-intro"></div></div>
+      <div><div class="icn"><i class="xi-link"></i></div><div class="psn links" id="t-links"></div></div>
+    </div>
+  </div>
+
+  <div id="content" class="box">
+    <div class="c-head">
+      <div class="icn"><i class="xi-gamepad"></i></div>
+      <div class="t"><b id="c-name">전체 보기</b><span>·</span><span id="c-count"></span></div>
+    </div>
+
+    <div class="wrapper"><div class="grid" id="grid"></div></div>
+
+    <div class="c-foot">과를 골라 게임을 시작하세요</div>
+
+    <div id="came">
+      <div class="c-head"><div class="icn"><i class="xi-folder"></i></div><div class="t"><b>CATEGORY</b></div></div>
+      <div class="list" id="catList"></div>
+      <button class="close" id="closeBtn"><span>CLOSE</span><div class="icn"><i class="xi-close-min"></i></div></button>
+    </div>
+  </div>
+</div>
+
+<div class="credit">made by 윰이쌤</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const fmt = d => { if (!d) return ""; const [y, m, dd] = d.split("-").map(Number); return months[m - 1] + " " + dd; };
+
+  // 왼쪽 정보
+  $("t-title").textContent = SETTINGS.title;
+  $("t-nick").textContent = SETTINGS.nick;
+  $("t-tags").innerHTML = SETTINGS.tags.map(t => `<span>${t}</span>`).join("");
+  $("t-intro").textContent = SETTINGS.intro;
+  $("t-links").innerHTML = SETTINGS.links.map(l => `<a href="${l.url}" target="_blank" rel="noopener">${l.text}</a>`).join("");
+  $("p-big").innerHTML = SETTINGS.profileBig;
+  $("p-small").textContent = SETTINGS.profileSmall;
+  if (SETTINGS.profileImage) {
+    const p = $("profile");
+    p.style.backgroundImage = `url('${SETTINGS.profileImage}')`;
+    p.querySelectorAll(".bubble, .deco").forEach(el => el.remove());
+  }
+
+  // 카드 그리기
+  function render(cat, word = "") {
+    const w = word.trim().toLowerCase();
+    const list = GAMES.filter(g => (!cat || g.cat === cat) &&
+      (!w || [g.title, g.sub, g.desc, g.cat].join(" ").toLowerCase().includes(w)));
+    $("c-name").textContent = w ? `"${word.trim()}" 검색 결과` : (cat || "전체 보기");
+    const n = list.filter(g => g.ready).length;
+    $("c-count").textContent = n + (n === 1 ? " game" : " games");
+    $("grid").innerHTML = list.length ? list.map(g => {
+      const tag = g.ready ? "a" : "div";
+      const href = g.ready ? ` href="${g.url}"` : "";
+      return `<${tag} class="card${g.ready ? "" : " locked"}"${href}>
+        <div class="thumb" style="background-image:${g.thumb ? `url('${g.thumb}')` : `linear-gradient(135deg,${g.colors[0]},${g.colors[1]})`}">
+          ${g.thumb ? "" : `<div class="num">${g.lesson}<small>과</small></div><div class="ic"><i class="${g.icon}"></i></div>`}
+        </div>
+        <div class="title">${g.title}${g.ready ? "" : '<i class="xi-lock"></i>'}</div>
+        <div class="meta">${g.sub}${g.date ? `<span class="dot">·</span>${fmt(g.date)}` : ""}</div>
+        <div class="sum">${g.desc}</div>
+      </${tag}>`;
+    }).join("") : `<div class="empty" style="grid-column:1/-1"><i class="xi-error"></i>아직 게임이 없어요</div>`;
+  }
+
+  // 카테고리 메뉴
+  const cats = [...new Set(GAMES.map(g => g.cat))];
+  $("catList").innerHTML =
+    `<button data-cat="" class="on">전체 보기 <span>${GAMES.length}</span></button>` +
+    cats.map(c => `<button data-cat="${c}">${c} <span>${GAMES.filter(g => g.cat === c).length}</span></button>`).join("");
+  $("catList").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    document.querySelectorAll("#catList button").forEach(x => x.classList.toggle("on", x === b));
+    render(b.dataset.cat);
+    $("came").classList.remove("open");
+  });
+  $("menuBtn").onclick = () => $("came").classList.toggle("open");
+  $("closeBtn").onclick = () => $("came").classList.remove("open");
+
+  render("");
+  window.addEventListener("load", () => document.body.classList.add("loaded"));
+</script>
+</body>
+</html>
