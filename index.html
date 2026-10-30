@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>윰이쌤 복습 게임방</title>
+  <title>윰이쌤의 영어 교실 아카이브</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xpressengine/xeicon@2.3.3/xeicon.min.css">
   <link rel="stylesheet" href="https://hangeul.pstatic.net/hangeul_static/css/nanum-square-round.css">
   <style>
-    /* ===== 색·크기는 여기서 바꾸면 돼요 ===== */
+    /* ===== 색·크기 변경 ===== */
     :root {
       --bg: #EFEFEF;          /* 바깥 배경 */
       --main-bg: #FFFFFF;     /* 박스 배경 */
@@ -139,19 +139,17 @@
 <body>
 
 <!-- =====================================================
-     ✏️ 수정은 아래 SETTINGS / GAMES 부분만 고치면 돼요
+     ✏️ SETTINGS / GAMES
      ===================================================== -->
 <script>
 const SETTINGS = {
-  title: "Review Room",                 // 왼쪽 위 제목
+  title: "English Archive",                 // 왼쪽 위 제목
   nick: "윰이쌤",                         // 닉네임 줄
   tags: ["#수도공고", "#English"],
   intro: "윰이쌤의 영어 수업 아카이브 :)",
   profileImage: "",                     // 사진 넣고 싶으면 "images/profile.jpg" 처럼 경로 입력
-  profileBig: "Let's<br>Review!",
-  profileSmall: "수도공고 1학년 영어 복습 게임",
   links: [
-    { text: "교시 알리미", url: "#" }   // ← 교시 알리미 주소를 넣어주세요
+    { text: "교시 알리미", url: "https://prodar2youme.github.io/sudo_timetable/" }   // ← 교시 알리미 주소를 넣어주세요
   ]
 };
 
@@ -216,7 +214,7 @@ const GAMES = [
   </div>
 </div>
 
-<div class="credit">made by 윰이쌤</div>
+<div class="credit">creadted by Youme</div>
 
 <script>
   const $ = id => document.getElementById(id);
